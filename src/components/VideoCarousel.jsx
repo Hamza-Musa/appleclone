@@ -1,10 +1,12 @@
-import React, { useRef, useState, useEffect } from "react";
-import { hightlightsSlides } from "../constants";
-import { pauseImg, playImg, replayImg } from "../utils";
+import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/all";
-import gsap from "gsap";
 gsap.registerPlugin(ScrollTrigger);
+import { useEffect, useRef, useState } from "react";
+
+import { hightlightsSlides } from "../constants";
+import { pauseImg, playImg, replayImg } from "../utils";
+
 const VideoCarousel = () => {
   // a ref to store references to the video elements.
   const videoRef = useRef([]);
@@ -12,6 +14,7 @@ const VideoCarousel = () => {
   const videoSpanRef = useRef([]);
   // a ref to store references to the div elements that contain the progress bar spans.
   const videoDivRef = useRef([]);
+
   const [video, setVideo] = useState({
     isEnd: false,
     startPlay: false,
@@ -19,8 +22,10 @@ const VideoCarousel = () => {
     isLastVideo: false,
     isPlaying: false,
   });
+
   const [loadedData, setLoadedData] = useState([]);
   const { isEnd, isLastVideo, startPlay, videoId, isPlaying } = video;
+
   useGSAP(() => {
     // animate the #slider element's transform property, moving it horizontally based on the videoId.
     gsap.to("#slider", {
@@ -42,40 +47,31 @@ const VideoCarousel = () => {
     });
   }, [isEnd, videoId]);
 
-  // to control the video playback, pausing if not playing and playing if the video has started.
-  useEffect(() => {
-    if (loadedData.length > 3) {
-      if (!isPlaying) {
-        videoRef.current[videoId].pause();
-      } else {
-        startPlay && videoRef.current[videoId].play();
-      }
-    }
-  }, [startPlay, videoId, isPlaying, loadedData]);
-
-  // handleLoadedMetadata adds the video metadata to the loadedData state when the video is ready.
-  const handleLoadedMetadata = (i, e) => setLoadedData((pre) => [...pre, e]);
-
   // to control the progress bar animation
   useEffect(() => {
     let currentProgress = 0;
     let span = videoSpanRef.current;
+
     if (span[videoId]) {
       // Animating the progress bar and updating its appearance as the video plays.
       let anim = gsap.to(span[videoId], {
         onUpdate: () => {
           // Animates the width of the video progress div based on the current screen size and progress.
           const progress = Math.ceil(anim.progress() * 100);
-          if (progress !== currentProgress) {
+
+          if (progress != currentProgress) {
             currentProgress = progress;
+
+            // set the width of the current progress bar
             gsap.to(videoDivRef.current[videoId], {
               width:
                 window.innerWidth < 760
-                  ? "10vw"
+                  ? "10vw" // mobile
                   : window.innerWidth < 1200
-                  ? "10vw"
-                  : "4vw",
+                  ? "10vw" // tablet
+                  : "4vw", // laptop
             });
+
             // to animate the progress bar width and color based on the current video progress
             gsap.to(span[videoId], {
               width: `${currentProgress}%`,
@@ -83,6 +79,8 @@ const VideoCarousel = () => {
             });
           }
         },
+
+        // when the video is ended, replace the progress bar with the indicator and change the background color
         onComplete: () => {
           if (isPlaying) {
             // Resets the width of the progress bar to a small size when the video is complete.
@@ -97,9 +95,10 @@ const VideoCarousel = () => {
         },
       });
 
-      if (videoId === 0) {
+      if (videoId == 0) {
         anim.restart();
       }
+
       // to update the animation progress based on the current video time and its duration.
       const animUpdate = () => {
         anim.progress(
@@ -107,6 +106,7 @@ const VideoCarousel = () => {
             hightlightsSlides[videoId].videoDuration
         );
       };
+
       // Adds or removes the animation update function from the GSAP ticker based on whether the video is playing.
       if (isPlaying) {
         gsap.ticker.add(animUpdate);
@@ -115,6 +115,20 @@ const VideoCarousel = () => {
       }
     }
   }, [videoId, startPlay]);
+
+  // to control the video playback, pausing if not playing and playing if the video has started.
+  useEffect(() => {
+    if (loadedData.length > 3) {
+      if (!isPlaying) {
+        videoRef.current[videoId].pause();
+      } else {
+        startPlay && videoRef.current[videoId].play();
+      }
+    }
+  }, [startPlay, videoId, isPlaying, loadedData]);
+
+  // handleLoadedMetadata adds the video metadata to the loadedData state when the video is ready.
+  const handleLoadedMetadata = (i, e) => setLoadedData((pre) => [...pre, e]);
 
   const handleProcess = (type, i) => {
     switch (type) {
@@ -132,9 +146,9 @@ const VideoCarousel = () => {
       case "play":
         setVideo((pre) => ({ ...pre, isPlaying: !pre.isPlaying }));
         break;
-      //   case "pause":
-      //     setVideo((pre) => ({ ...pre, isPlaying: !pre.isPlaying }));
-      //     break;
+      case "pause":
+        setVideo((pre) => ({ ...pre, isPlaying: !pre.isPlaying }));
+        break;
       default:
         return video;
     }
@@ -152,6 +166,9 @@ const VideoCarousel = () => {
                   preload="auto"
                   //   autoPlay
                   muted
+                  className={`${
+                    list.id === 2 && "translate-x-44"
+                  } pointer-events-none`}
                   ref={(el) => (videoRef.current[i] = el)}
                   onEnded={() =>
                     i !== 3
@@ -168,9 +185,10 @@ const VideoCarousel = () => {
                   <source src={list.video} type="video/mp4" />
                 </video>
               </div>
+
               <div className="absolute top-12 left-[5%] z-10">
-                {list.textLists.map((text) => (
-                  <p key={text} className="md:text-2xl text-xl font-medium">
+                {list.textLists.map((text, i) => (
+                  <p key={i} className="md:text-2xl text-xl font-medium">
                     {text}
                   </p>
                 ))}
@@ -203,7 +221,7 @@ const VideoCarousel = () => {
                 ? () => handleProcess("video-reset")
                 : !isPlaying
                 ? () => handleProcess("play")
-                : handleProcess("pause")
+                : () => handleProcess("pause")
             }
           />
         </button>
