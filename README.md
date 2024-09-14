@@ -7,7 +7,7 @@
     <img src="https://img.shields.io/badge/-Tailwind_CSS-black?style=for-the-badge&logoColor=white&logo=tailwindcss&color=06B6D4" alt="tailwindcss" />
   </div>
 
-  <h3 align="center">Iphone 15 Website</h3>
+  <h3 align="center">IPhone 15 Website</h3>
 
    <div align="center">
      Click Here to See Project<a href="https://applewebsite-hn.vercel.app/" target="_blank"><b>View</b></a> 
