@@ -10,7 +10,7 @@
   <h3 align="center">IPhone 15 Website</h3>
 
    <div align="center">
-     Click Here to See Project<a href="https://applewebsite-hn.vercel.app/" target="_blank"><b>View</b></a> 
+     Click Here to See Project <a href="https://applewebsite-hn.vercel.app/" target="_blank"><b>View</b></a> 
     </div>
 </div>
 
