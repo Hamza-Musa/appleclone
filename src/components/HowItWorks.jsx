@@ -51,9 +51,9 @@ const HowItWorks = () => {
                 className="bg-transparent relative z-10"
               />
             </div>
-            <div className="hiw-video">
+            <div className="hiw-video flex-center">
               <video
-                className="pointer-events-none "
+                className="pointer-events-none"
                 playsInline
                 preload="none"
                 muted
